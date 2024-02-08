@@ -73,14 +73,28 @@ public class DnsMessage {
     }
 
     private String decodeDomainName(ByteBuffer buffer) {
-        byte b;
+        byte labelL;
         StringJoiner labels = new StringJoiner(".");
-        while ((b = buffer.get()) != 0) {
-            byte[] dst = new byte[b];
-            buffer.get(dst);
-            labels.add(new String(dst));
+        boolean  compress= false;
+        int  index= 0;
+        while ((labelL = buffer.get()) != 0) {
+            if ((labelL & 0xC0) == 0xC0) {
+                compress = true;
+                int offset = ((labelL & 0x3F) << 8) | (buffer.get() & 0xFF);
+                index = buffer.position();
+                buffer.position(offset);
+            } else {
+                byte[] label = new byte[labelL];
+                buffer.get(label);
+                labels.add(new String(label));
+            }
+        }
+
+        if (compress) {
+            buffer.position(index);
         }
         return labels.toString();
+
     }
 
     public byte[] array() {
