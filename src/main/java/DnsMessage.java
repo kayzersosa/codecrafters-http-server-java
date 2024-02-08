@@ -1,18 +1,20 @@
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
 public class DnsMessage {
-    public short id = 1234;
+    public short id;
     public short flags;
-    // public short qdcount;
-    // public short ancount;
-    public short nscount;
-    public short arcount;
+    public List<String> questionList = new ArrayList<>();
     public Map<String, byte[]> map = new HashMap<>();
+
+    public DnsMessage() {
+    }
 
     public DnsMessage(byte[] array) {
         ByteBuffer buffer = ByteBuffer.wrap(array);
@@ -20,29 +22,42 @@ public class DnsMessage {
         id = buffer.getShort();
         flags = buffer.getShort();
         int qdcount = buffer.getShort();
-        buffer.getShort(); // ancount
-        nscount = buffer.getShort();
-        arcount = buffer.getShort();
+        int ancount = buffer.getShort();
+        buffer.getShort(); // nscount
+        buffer.getShort(); // arcount
+
         // Parse question section
         for (int i = 0; i < qdcount; i++) {
-            map.put(decodeDomainName(buffer), new byte[] { 8, 8, 8, 8 });
+            questionList.add(decodeDomainName(buffer));
             buffer.getShort(); // Type
             buffer.getShort(); // Class
+        }
+
+        // Parse answer section
+        for (int i = 0; i < ancount; i++) {
+            String domain = decodeDomainName(buffer);
+            buffer.getShort(); // Type = A
+            buffer.getShort(); // Class = IN
+            buffer.getInt(); // TTL
+            buffer.getShort(); // Length
+            byte[] ip = new byte[4];
+            buffer.get(ip); // Data
+            map.put(domain, ip);
         }
     }
 
     private ByteBuffer writeHeader(ByteBuffer buffer) {
         buffer.putShort(id);
         buffer.putShort(flags);
+        buffer.putShort((short) questionList.size());
         buffer.putShort((short) map.size());
-        buffer.putShort((short) map.size());
-        buffer.putShort(nscount);
-        buffer.putShort(arcount);
+        buffer.putShort((short) 0); // nscount
+        buffer.putShort((short) 0); // arcount
         return buffer;
     }
 
     private ByteBuffer writeQuestion(ByteBuffer buffer) {
-        for (String domain : map.keySet()) {
+        for (String domain : questionList) {
             buffer.put(encodeDomainName(domain));
             buffer.putShort((short) 1); // Type = A
             buffer.putShort((short) 1); // Class = IN
@@ -75,8 +90,8 @@ public class DnsMessage {
     private String decodeDomainName(ByteBuffer buffer) {
         byte labelL;
         StringJoiner labels = new StringJoiner(".");
-        boolean  compress= false;
-        int  index= 0;
+        boolean compress = false;
+        int index = 0;
         while ((labelL = buffer.get()) != 0) {
             if ((labelL & 0xC0) == 0xC0) {
                 compress = true;
@@ -109,4 +124,12 @@ public class DnsMessage {
         return byteBuffer.array();
     }
 
+    public DnsMessage clone() {
+        DnsMessage clone = new DnsMessage();
+        clone.id = id;
+        clone.flags = flags;
+        clone.questionList.addAll(questionList);
+        clone.map.putAll(map);
+        return clone;
+    }
 }
