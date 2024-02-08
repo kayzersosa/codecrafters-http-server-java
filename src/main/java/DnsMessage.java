@@ -1,68 +1,86 @@
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringJoiner;
 
 public class DnsMessage {
     public short id = 1234;
-    public short flags = (short)0b10000000_00000000;
-    public short qdcount = 1;
-    public short ancount = 1;
+    public short flags;
+    // public short qdcount;
+    // public short ancount;
     public short nscount;
     public short arcount;
+    public Map<String, byte[]> map = new HashMap<>();
 
     public DnsMessage(byte[] array) {
         ByteBuffer buffer = ByteBuffer.wrap(array);
         // Parse header section
         id = buffer.getShort();
         flags = buffer.getShort();
-        qdcount = buffer.getShort();
-        /*ancount =*/buffer.getShort();
+        int qdcount = buffer.getShort();
+        buffer.getShort(); // ancount
         nscount = buffer.getShort();
         arcount = buffer.getShort();
-        // Set flags
-        char[] requestFlags = String.format("%16s", Integer.toBinaryString(flags))
-                                  .replace(' ', '0')
-                                  .toCharArray();
-        requestFlags[0] = '1';  // QR
-        requestFlags[13] = '1'; // RCODE
-        flags = (short)Integer.parseInt(new String(requestFlags), 2);
-      }
+        // Parse question section
+        for (int i = 0; i < qdcount; i++) {
+            map.put(decodeDomainName(buffer), new byte[] { 8, 8, 8, 8 });
+            buffer.getShort(); // Type
+            buffer.getShort(); // Class
+        }
+    }
 
     private ByteBuffer writeHeader(ByteBuffer buffer) {
         buffer.putShort(id);
         buffer.putShort(flags);
-        buffer.putShort(qdcount);
-        buffer.putShort(ancount);
+        buffer.putShort((short) map.size());
+        buffer.putShort((short) map.size());
         buffer.putShort(nscount);
         buffer.putShort(arcount);
         return buffer;
     }
 
     private ByteBuffer writeQuestion(ByteBuffer buffer) {
-        buffer.put(encodeDomainName("codecrafters.io"));
-        buffer.putShort((short)1); // Type = A
-        buffer.putShort((short)1); // Class = IN
+        for (String domain : map.keySet()) {
+            buffer.put(encodeDomainName(domain));
+            buffer.putShort((short) 1); // Type = A
+            buffer.putShort((short) 1); // Class = IN
+        }
         return buffer;
     }
 
     private void writeAnswerSection(ByteBuffer buffer) {
-        buffer.put(encodeDomainName("codecrafters.io"));
-        buffer.putShort((short)1);           // Type 1 for A record
-        buffer.putShort((short)1);           // Class 1 for IN
-        buffer.putInt(60);                   // TTL
-        buffer.putShort((short)4);           // RDLENGTH
-        buffer.put(new byte[] {8, 8, 8, 8}); // RDATA
+        for (String domain : map.keySet()) {
+            buffer.put(encodeDomainName(domain));
+            buffer.putShort((short) 1); // Type = A
+            buffer.putShort((short) 1); // Class = IN
+            buffer.putInt(60); // TTL
+            buffer.putShort((short) 4); // Length
+            buffer.put(map.get(domain)); // Data
+        }
     }
 
     private byte[] encodeDomainName(String domain) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        for (String label : domain.split("\\.")) {  
+        for (String label : domain.split("\\.")) {
             out.write(label.length());
             out.writeBytes(label.getBytes(StandardCharsets.UTF_8));
 
         }
         out.write(0);
         return out.toByteArray();
+    }
+
+    private String decodeDomainName(ByteBuffer buffer) {
+        byte b;
+        StringJoiner labels = new StringJoiner(".");
+        while ((b = buffer.get()) != 0) {
+            byte[] dst = new byte[b];
+            buffer.get(dst);
+            labels.add(new String(dst));
+        }
+        return labels.toString();
     }
 
     public byte[] array() {

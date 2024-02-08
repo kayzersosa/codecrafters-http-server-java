@@ -14,9 +14,21 @@ public class Main {
         final DatagramPacket packet = new DatagramPacket(buf, buf.length);
         serverSocket.receive(packet);
         System.out.println("Received data");
+        // Request
 
         DnsMessage dnsMessage = new DnsMessage(buf);
-        byte[] bufResponse = dnsMessage.array();
+        DnsMessage responseDnsMessage = dnsMessage;
+
+        // Set flags
+        char[] requestFlags = String.format("%16s", Integer.toBinaryString(responseDnsMessage.flags))
+            .replace(' ', '0')
+            .toCharArray();
+        requestFlags[0] = '1'; // QR
+        requestFlags[13] = '1'; // RCODE
+
+        responseDnsMessage.flags = (short) Integer.parseInt(new String(requestFlags), 2);
+
+        byte[] bufResponse = responseDnsMessage.array();
 
         final DatagramPacket packetResponse = new DatagramPacket(bufResponse, bufResponse.length,
             packet.getSocketAddress());
