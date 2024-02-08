@@ -14,7 +14,10 @@ public class Main {
         final DatagramPacket packet = new DatagramPacket(buf, buf.length);
         serverSocket.receive(packet);
         System.out.println("Received data");
-        final byte[] bufResponse = new DnsMessage().array();
+
+        DnsMessage dnsMessage = new DnsMessage(buf);
+        byte[] bufResponse = dnsMessage.array();
+
         final DatagramPacket packetResponse = new DatagramPacket(bufResponse, bufResponse.length,
             packet.getSocketAddress());
         serverSocket.send(packetResponse);

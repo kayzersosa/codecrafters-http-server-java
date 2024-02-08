@@ -10,8 +10,23 @@ public class DnsMessage {
     public short nscount;
     public short arcount;
 
-    public DnsMessage() {
-    }
+    public DnsMessage(byte[] array) {
+        ByteBuffer buffer = ByteBuffer.wrap(array);
+        // Parse header section
+        id = buffer.getShort();
+        flags = buffer.getShort();
+        qdcount = buffer.getShort();
+        /*ancount =*/buffer.getShort();
+        nscount = buffer.getShort();
+        arcount = buffer.getShort();
+        // Set flags
+        char[] requestFlags = String.format("%16s", Integer.toBinaryString(flags))
+                                  .replace(' ', '0')
+                                  .toCharArray();
+        requestFlags[0] = '1';  // QR
+        requestFlags[13] = '1'; // RCODE
+        flags = (short)Integer.parseInt(new String(requestFlags), 2);
+      }
 
     private ByteBuffer writeHeader(ByteBuffer buffer) {
         buffer.putShort(id);
