@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // Uncomment this block to pass the first stage
         System.out.print("$ ");
-
+        String path  = null;
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
         do {
@@ -26,10 +26,10 @@ public class Main {
                 System.out.println(getEchoMessage(input));
             } else if (isType(input)) {
                 System.out.println(getTypeMessage(input));
+                path = getPath(input);
+                getTypePath(input, path);
             } else {
                 System.out.println(input + COMMAND_NOT_FOUND);
-                String path = getPath(input);
-                getTypePath(input, path);  
             }
             System.out.print(PROMPT);
 
