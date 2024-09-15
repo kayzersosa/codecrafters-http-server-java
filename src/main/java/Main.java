@@ -6,7 +6,7 @@ public class Main {
     private static final String PROMPT = "$ ";
     private static final String EXIT = "exit 0";
     private static final String ECHO = "echo";
-    private static final String[] TYPECOMMAND = { "type echo", "type exit", "type cat" };
+    private static final String[] TYPECOMMAND = { "type echo", "type exit", "type cat" , "type type" };
 
     public static void main(String[] args) throws Exception {
         // Uncomment this block to pass the first stage
@@ -59,7 +59,7 @@ public class Main {
                 return true;
             }
 
-            if (input.equals(TYPECOMMAND[0]) || input.equals(TYPECOMMAND[1]) || input.equals(TYPECOMMAND[2])) {
+            if (input.equals(TYPECOMMAND[0]) || input.equals(TYPECOMMAND[1]) || input.equals(TYPECOMMAND[2]) || input.equals(TYPECOMMAND[3])) {
                 return true;
             }
 
@@ -77,6 +77,8 @@ public class Main {
             return "exit is a shell builtin";
         } else if (input.equals(TYPECOMMAND[2])) {
             return "cat is /bin/cat";
+        }else if (input.equals(TYPECOMMAND[3])) {
+            return "type is a shell builtin";
         }
         return input.substring(4) + ": not found";
     }
