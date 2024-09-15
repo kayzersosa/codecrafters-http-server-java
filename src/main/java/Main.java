@@ -55,7 +55,6 @@ public class Main {
     private static Boolean isType(String input) {
 
         try {
-            System.out.println(input.substring(0, 4));
             if (input.substring(0, 4).equals("type") && input.charAt(4) == ' ') {
                 return true;
             }
