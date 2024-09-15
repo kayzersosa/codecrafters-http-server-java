@@ -17,7 +17,6 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
         do {
-            System.out.print(PROMPT);
             if (input.equals(EXIT)) {
                 break;
             }
@@ -30,8 +29,7 @@ public class Main {
             } else {
                 System.out.println(input + COMMAND_NOT_FOUND);
             }
-            //System.out.print(PROMPT);
-
+            System.out.print(PROMPT);
             input = scanner.nextLine();
         } while (!input.matches(""));
 
