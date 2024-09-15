@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         // Uncomment this block to pass the first stage
-        System.out.print("$ ");
+        System.out.print(PROMPT);
         String path  = null;
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
@@ -21,7 +21,6 @@ public class Main {
             if (input.equals(EXIT)) {
                 break;
             }
-
             if (isEcho(input)) {
                 System.out.println(getEchoMessage(input));
             } else if (isType(input)) {
