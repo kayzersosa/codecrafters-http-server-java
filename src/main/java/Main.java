@@ -4,6 +4,7 @@ public class Main {
 
     private static final String COMMAND_NOT_FOUND = ": command not found";    
     private static final String PROMPT = "$ ";  
+    private static final String EXIT = "exit 0";
     public static void main(String[] args) throws Exception {
         // Uncomment this block to pass the first stage
          System.out.print("$ ");
@@ -11,6 +12,9 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
         do {
+            if (input.equals(EXIT)) {
+                break;
+            }
             System.out.println(input + COMMAND_NOT_FOUND);
             System.out.print(PROMPT);
             input = scanner.nextLine();
