@@ -34,7 +34,7 @@ public class Main {
 
 
     private static Boolean isEcho(String input) {
-        if (input.length() < 4){
+        if (input.length() <= 4){
             return false;
         }
         if (ECHO.equals(input.substring(0, 4)) && input.charAt(4) == ' ') {
@@ -45,7 +45,7 @@ public class Main {
 
     private static String getEchoMessage(String input) {
         if (input.length() > 4 ) {
-            return input;
+            return input.substring(5);
         }
         return ECHO;
         
