@@ -1,3 +1,5 @@
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class Main {
@@ -6,7 +8,7 @@ public class Main {
     private static final String PROMPT = "$ ";
     private static final String EXIT = "exit 0";
     private static final String ECHO = "echo";
-    private static final String[] TYPECOMMAND = { "type echo", "type exit", "type cat" , "type type" };
+    private static final String[] TYPECOMMAND = { "type echo", "type exit", "type cat", "type type" };
 
     public static void main(String[] args) throws Exception {
         // Uncomment this block to pass the first stage
@@ -26,6 +28,8 @@ public class Main {
                 System.out.println(getTypeMessage(input));
             } else {
                 System.out.println(input + COMMAND_NOT_FOUND);
+                String path = getPath(input);
+                getTypePath(input, path);  
             }
             System.out.print(PROMPT);
 
@@ -59,7 +63,8 @@ public class Main {
                 return true;
             }
 
-            if (input.equals(TYPECOMMAND[0]) || input.equals(TYPECOMMAND[1]) || input.equals(TYPECOMMAND[2]) || input.equals(TYPECOMMAND[3])) {
+            if (input.equals(TYPECOMMAND[0]) || input.equals(TYPECOMMAND[1]) || input.equals(TYPECOMMAND[2])
+                    || input.equals(TYPECOMMAND[3])) {
                 return true;
             }
 
@@ -77,9 +82,28 @@ public class Main {
             return "exit is a shell builtin";
         } else if (input.equals(TYPECOMMAND[2])) {
             return "cat is /bin/cat";
-        }else if (input.equals(TYPECOMMAND[3])) {
+        } else if (input.equals(TYPECOMMAND[3])) {
             return "type is a shell builtin";
         }
         return input.substring(5) + ": not found";
+    }
+
+    private static String getPath(String parameter) {
+
+        for (String path : System.getenv("PATH").split(":")) {
+            Path fullPath = Path.of(path, parameter);
+            if (Files.isRegularFile(fullPath)) {
+                return fullPath.toString();
+            }
+        }
+        return null;
+    }
+
+    private static void getTypePath(String input , String path) {
+       if (path != null) {
+            System.out.println(input.substring(5) + " is " + path);
+        } else {
+            System.out.println(input.substring(5) + ": not found");
+        }
     }
 }
