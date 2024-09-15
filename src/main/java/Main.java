@@ -80,6 +80,6 @@ public class Main {
         }else if (input.equals(TYPECOMMAND[3])) {
             return "type is a shell builtin";
         }
-        return input.substring(4) + ": not found";
+        return input.substring(5) + ": not found";
     }
 }
