@@ -1,6 +1,3 @@
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,8 +10,9 @@ public class Main {
         
         String path = null;
         Scanner scanner = new Scanner(System.in);
-        List<String> builtins = commands();
-        
+        Command cmd = new Command();
+        List<String> builtins = cmd.getCommands();
+      
         while(true) {
             System.out.print(PROMPT);
             String input = scanner.nextLine();
@@ -24,56 +22,27 @@ public class Main {
 
             switch (command) {
                 case "exit":
-                if (parameter.equals("0")) {
-                    System.exit(0);
-                  } else {
-                    System.out.println(input + ": command not found");
-                  }
+                    cmd.exit(parameter, input);
                     break;
                 case "echo":
-                  System.out.println(parameter);
+                    cmd.echo(parameter);
                     break;
                 case "type":
-                    if (parameter.equals(builtins.get(0)) ||
-                        parameter.equals(builtins.get(1)) ||
-                         parameter.equals(builtins.get(2))) {
-                         System.out.println(parameter + " is a shell builtin");
-                     } else {
-                        path = getPath(parameter);
-                        if (path != null) {
-                            System.out.println(parameter + " is " + path);
-                        } else {
-                                System.out.println(parameter + ": not found");
-                        }
-                     }
+                     cmd.type(parameter, builtins);
                      break;   
                 default:
-                 System.out.println(input + ": command not found");
+                   if(!parameter.equals("")) {
+                       cmd.execute(command, parameter);
+                    } else {
+                      System.out.println(input + ": command not found");
+                    }
             }
 
         } 
         
     }
 
-    private static String getPath(String parameter) {
-
-        for (String path : System.getenv("PATH").split(":")) {
-            Path fullPath = Path.of(path, parameter);
-            if (Files.isRegularFile(fullPath)) {
-                return fullPath.toString();
-            }
-        }
-        return null;
-    }
-
-       private static List<String> commands() {
-        List<String> commands = new ArrayList<>();
-        commands.add("exit");
-        commands.add("echo");
-        commands.add("type");
-        return commands;
-    }
-
+   
     private static String getParameter(String[] str) {
         String parameter = "";
         if (str.length > 2) {
