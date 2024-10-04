@@ -7,8 +7,6 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         // Uncomment this block to pass the first stage
-        
-        String path = null;
         Scanner scanner = new Scanner(System.in);
         Command cmd = new Command();
         List<String> builtins = cmd.getCommands();

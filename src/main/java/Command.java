@@ -7,11 +7,10 @@ public class Command {
     private List<String> commands = null;
 
     public Command() {
-        commands();
     }
 
     public List<String> getCommands() {
-        return commands;
+        return commands();
     }
 
     public void echo(String parameter) {
