@@ -5,10 +5,14 @@ import java.util.List;
 
 public class Command {
     private List<String> commands = null;
-
+    private String dir = null;
     public Command() {
     }
 
+    public String getDir() {
+        this.dir = Path.of("").toAbsolutePath().toString();
+        return dir;
+    }
     public List<String> getCommands() {
         return commands();
     }
@@ -42,25 +46,14 @@ public class Command {
     }
 
     public void pwd() {
-        String dir = Path.of("").toAbsolutePath().toString();
         System.out.println(dir);
     }
 
     public void cd(String parameter) {
-        String dir = Path.of("").toAbsolutePath().toString();
-        String cd = parameter;
-        if (!cd.startsWith("/")) {
-            if (!cd.equals("~")) {
-                cd = dir + "/" + parameter;
-            } else {
-                cd = System.getenv("HOME");
-            }
-        }
-
-        if (Files.isDirectory(Path.of(cd))) {
-            dir = Path.of(cd).normalize().toString();
-        } else {
-            System.out.println("cd: " + cd + ": No such file or directory");
+        if (Files.isDirectory(Path.of(parameter))) {
+            this.dir = parameter;
+          } else {
+            System.out.println("cd: " + parameter + ": No such file or directory");
         }
     }
 
