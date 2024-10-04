@@ -16,20 +16,20 @@ public class Command {
     public void echo(String parameter) {
         System.out.println(parameter);
     }
-    public void exit(String parameter,String input) {
+
+    public void exit(String parameter, String input) {
         if (parameter.equals("0")) {
             System.exit(0);
-          } else {
+        } else {
             System.out.println(input + ": command not found");
-          }
+        }
     }
+
     public void type(String parameter, List<String> builtins) {
         if (parameter.equals(builtins.get(0)) ||
                 parameter.equals(builtins.get(1)) ||
-                parameter.equals(builtins.get(2))||
-                parameter.equals(builtins.get(3))
-            ) 
-         {
+                parameter.equals(builtins.get(2)) ||
+                parameter.equals(builtins.get(3))) {
             System.out.println(parameter + " is a shell builtin");
         } else {
             String path = getPath(parameter);
@@ -44,6 +44,24 @@ public class Command {
     public void pwd() {
         String dir = Path.of("").toAbsolutePath().toString();
         System.out.println(dir);
+    }
+
+    public void cd(String parameter) {
+        String dir = Path.of("").toAbsolutePath().toString();
+        String cd = parameter;
+        if (!cd.startsWith("/")) {
+            if (!cd.equals("~")) {
+                cd = dir + "/" + parameter;
+            } else {
+                cd = System.getenv("HOME");
+            }
+        }
+
+        if (Files.isDirectory(Path.of(cd))) {
+            dir = Path.of(cd).normalize().toString();
+        } else {
+            System.out.println("cd: " + cd + ": No such file or directory");
+        }
     }
 
     public void execute(String command, String parameter) throws Exception {

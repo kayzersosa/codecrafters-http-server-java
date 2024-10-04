@@ -31,6 +31,9 @@ public class Main {
                 case "pwd":
                     cmd.pwd();
                     break; 
+                case "cd":
+                    cmd.cd(parameter);
+                    break;
                 default:
                    if(!parameter.equals("")) {
                        cmd.execute(command, parameter);
