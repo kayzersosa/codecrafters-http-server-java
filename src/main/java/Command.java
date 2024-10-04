@@ -54,11 +54,15 @@ public class Command {
 
     public void cd(String parameter) {
         String cd = parameter;
-        if(!cd.startsWith("/")) {
-            cd = dir + "/" + parameter;
-        }    
+        if (!cd.startsWith("/")) {
+            if (!cd.equals("~")) {
+                cd = dir + "/" + parameter;
+            } else {
+                cd = System.getenv("HOME");
+            }
+        }
 
-        if(Files.isDirectory(Path.of(cd))) {
+        if (Files.isDirectory(Path.of(cd))) {
             dir = Path.of(cd).normalize().toString();
         } else {
             System.out.println("cd: " + cd + ": No such file or directory");
