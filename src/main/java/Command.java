@@ -53,11 +53,17 @@ public class Command {
     }
 
     public void cd(String parameter) {
-        if (Files.isDirectory(Path.of(parameter))) {
-            this.dir = parameter;
-          } else {
-            System.out.println("cd: " + parameter + ": No such file or directory");
+        String cd = parameter;
+        if(!cd.startsWith("/")) {
+            cd = dir + "/" + parameter;
+        }    
+
+        if(Files.isDirectory(Path.of(cd))) {
+            dir = Path.of(cd).normalize().toString();
+        } else {
+            System.out.println("cd: " + cd + ": No such file or directory");
         }
+
     }
 
     public void execute(String command, String parameter) throws Exception {
