@@ -39,6 +39,11 @@ public class Command {
         }
     }
 
+    public void pwd() {
+        String dir = Path.of("").toAbsolutePath().toString();
+        System.out.println(dir);
+    }
+
     public void execute(String command, String parameter) throws Exception {
         String path = getPath(command);
         if (path != null) {
@@ -55,6 +60,7 @@ public class Command {
         commands.add("exit");
         commands.add("echo");
         commands.add("type");
+        commands.add("pwd");
         return commands;
     }
 

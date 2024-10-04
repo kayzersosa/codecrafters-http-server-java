@@ -29,7 +29,10 @@ public class Main {
                     break;
                 case "type":
                      cmd.type(parameter, builtins);
-                     break;   
+                     break;  
+                case "pwd":
+                    cmd.pwd();
+                    break; 
                 default:
                    if(!parameter.equals("")) {
                        cmd.execute(command, parameter);
