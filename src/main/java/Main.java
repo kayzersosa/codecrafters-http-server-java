@@ -6,13 +6,8 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final String COMMAND_NOT_FOUND = ": command not found";
     private static final String PROMPT = "$ ";
-    private static final String EXIT = "exit 0";
-    private static final String ECHO = "echo";
-    private static final String TYPE = "type";
-    private static final String[] TYPECOMMAND = { "type echo", "type exit", "type cat", "type type" };
-
+    
     public static void main(String[] args) throws Exception {
         // Uncomment this block to pass the first stage
         
@@ -36,14 +31,14 @@ public class Main {
                   }
                     break;
                 case "echo":
-                  System.out.println(getEchoMessage(input));
+                  System.out.println(parameter);
+                    break;
                 case "type":
                     if (parameter.equals(builtins.get(0)) ||
                         parameter.equals(builtins.get(1)) ||
                          parameter.equals(builtins.get(2))) {
                          System.out.println(parameter + " is a shell builtin");
                      } else {
-                        //System.out.println(command + ": not found");
                         path = getPath(parameter);
                         if (path != null) {
                             System.out.println(parameter + " is " + path);
@@ -59,14 +54,6 @@ public class Main {
         
     }
 
-       private static String getEchoMessage(String input) {
-        if (input.length() > 4) {
-            return input.substring(5);
-        }
-        return ECHO;
-    }
-
-    
     private static String getPath(String parameter) {
 
         for (String path : System.getenv("PATH").split(":")) {
