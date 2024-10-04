@@ -46,6 +46,9 @@ public class Command {
     }
 
     public void pwd() {
+        if(dir == null) {
+            dir = Path.of("").toAbsolutePath().toString();
+        }
         System.out.println(dir);
     }
 
